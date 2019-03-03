@@ -47,3 +47,10 @@ messages sent by users. It is a client/server based application.
 	- [socket.recv -- three ways to turn it into recvall (Python recipe)](https://code.activestate.com/recipes/408859/)
 	- [Python socket receive - incoming packets always have a different size](https://stackoverflow.com/q/1708835/5614968)
 	- [Socket Programming HOWTO](https://docs.python.org/3/howto/sockets.html)
+
+### References
+* [Discrete Fourier Transform (numpy.fft)](https://docs.scipy.org/doc/numpy/reference/routines.fft.html)
+* [Let’s Write a Chat App in Python](https://medium.com/swlh/lets-write-a-chat-app-in-python-f6783a9ac170)
+* [Object serialization in Python](https://www.thepythoncorner.com/2016/12/object-serialization-in-python/?doing_wp_cron=1551636082.3169770240783691406250)
+* [pickle — Python object serialization](https://docs.python.org/2/library/pickle.html)
+* [socket — Low-level networking interface](https://docs.python.org/3/library/socket.html)
