@@ -17,24 +17,24 @@ messages sent by users. It is a client/server based application.
 
 	`python3 client.py`
 
-	The client asks for the HOST address and PORT to connect to. If
+	The client asks for the `HOST` address and `PORT` to connect to. If
 	both client and server run in the same machine, no need to enter
 	the HOST. If server runs in port `33000` no need to enter it either.
 
 * Then user can follow instructions in the GUI window that pops up.
 
 ### Dependencies
-* numpy (for FFT)
-* tkinter (for GUI)
+* `numpy` (for FFT)
+* `tkinter` (for GUI)
 
 #### Installing dependencies
-* numpy
+* `numpy`
 
 	```
 	pip3 install numpy
 	```
 
-* tkinter
+* `tkinter`
 	For Ubuntu or Debian based distributions:
 	```
 	sudo apt install python3-tk
@@ -43,7 +43,7 @@ messages sent by users. It is a client/server based application.
 	For other platforms refer to the [official Tk documentation](https://tkdocs.com/tutorial/install.html).
 
 ### Notes
-* The maximum packet size is limited to 102400. It's a limitation which has to be fixed. References:
+* The maximum packet size is limited to `102400`. It's a limitation which has to be fixed. References:
 	- [socket.recv -- three ways to turn it into recvall (Python recipe)](https://code.activestate.com/recipes/408859/)
 	- [Python socket receive - incoming packets always have a different size](https://stackoverflow.com/q/1708835/5614968)
 	- [Socket Programming HOWTO](https://docs.python.org/3/howto/sockets.html)
