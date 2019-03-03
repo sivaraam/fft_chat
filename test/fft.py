@@ -10,6 +10,7 @@
 
 import numpy as np
 # import base64
+import pickle
 
 def process(utf8_string_in):
     """
@@ -35,10 +36,16 @@ def process(utf8_string_in):
     fft_array_out = np.fft.fft(fft_array_in)
     print("After applying FFT: ", fft_array_out)
 
+    serialized_fft_array = pickle.dumps(fft_array_out)
+    print("Serialized FFT array: ", serialized_fft_array)
+
+    deserialized_fft_array = pickle.loads(serialized_fft_array)
+    print("De-serialized FFT array: ", deserialized_fft_array)
+
     """
     Apply inverse FFT to the array
     """
-    ifft_array_out = np.fft.ifft(fft_array_out)
+    ifft_array_out = np.fft.ifft(deserialized_fft_array)
     print("After applying inverse FFT: ", ifft_array_out)
 
     """
