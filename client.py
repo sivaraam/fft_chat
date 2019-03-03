@@ -11,13 +11,14 @@ https://medium.com/swlh/lets-write-a-chat-app-in-python-f6783a9ac170
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
-
+import process_fft as p_fft
 
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
-            msg = client_socket.recv(BUFSIZ).decode("utf8")
+            received_bytes = client_socket.recv(BUFSIZ)
+            msg = p_fft.fft_receive(received_bytes)
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
             break
@@ -27,7 +28,8 @@ def send(event=None):  # event is passed by binders.
     """Handles sending of messages."""
     msg = my_msg.get()
     my_msg.set("")  # Clears input field.
-    client_socket.send(bytes(msg, "utf8"))
+    send_bytes = p_fft.fft_send(msg)
+    client_socket.send(send_bytes)
     if msg == "{quit}":
         client_socket.close()
         top.quit()
@@ -46,7 +48,7 @@ if not PORT:
 else:
     PORT = int(PORT)
 
-BUFSIZ = 1024
+BUFSIZ = 102400
 ADDR = (HOST, PORT)
 
 client_socket = socket(AF_INET, SOCK_STREAM)
