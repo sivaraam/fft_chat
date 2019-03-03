@@ -38,6 +38,20 @@ def on_closing(event=None):
     my_msg.set("{quit}")
     send()
 
+#----Now comes the sockets part----
+HOST = input('Enter host: ')
+PORT = input('Enter port: ')
+if not PORT:
+    PORT = 33000
+else:
+    PORT = int(PORT)
+
+BUFSIZ = 1024
+ADDR = (HOST, PORT)
+
+client_socket = socket(AF_INET, SOCK_STREAM)
+client_socket.connect(ADDR)
+
 top = tkinter.Tk()
 top.title("Chatter")
 
@@ -60,19 +74,8 @@ send_button.pack()
 
 top.protocol("WM_DELETE_WINDOW", on_closing)
 
-#----Now comes the sockets part----
-HOST = input('Enter host: ')
-PORT = input('Enter port: ')
-if not PORT:
-    PORT = 33000
-else:
-    PORT = int(PORT)
 
-BUFSIZ = 1024
-ADDR = (HOST, PORT)
-
-client_socket = socket(AF_INET, SOCK_STREAM)
-client_socket.connect(ADDR)
+print("You can now start chatting using the GUI.")
 
 receive_thread = Thread(target=receive)
 receive_thread.start()
