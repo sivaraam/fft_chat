@@ -3,7 +3,7 @@ A GUI based chat room that applies uses FFT to encode/decode
 messages sent by users. It is a client/server based application.
 
 ### Usage
-* See if [#Dependencies]() have been installed.
+* See if [Dependencies](#dependencies) have been installed.
 
 * Start the server:
 
