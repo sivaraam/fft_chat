@@ -1,11 +1,15 @@
 # A test python 3 program that:
 #
 #    1. Takes text as input
-#    3. Applies FFT to the the text (in it's corresponding numerical value)
-#    4. Prints the output of FFT
-#    5. Applies inverse FFT to the FFT output
-#    6. Converts it back to text
-#    7. Prints the resulting text
+#    2. Applies FFT to the the text (in it's corresponding numerical value)
+#    3. Prints the output of FFT
+#    4. Serializes the FFT output
+#    5. Prints the serialized output
+#    6. De-serializes the serizlied output
+#    7. Prints the deserialized output
+#    8. Applies inverse FFT to the de-serialized FFT output
+#    9. Converts it back to text
+#   10. Prints the resulting text
 #
 
 import numpy as np
