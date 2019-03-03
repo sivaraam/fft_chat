@@ -4,7 +4,7 @@ then converts them back to the message after applying inverse
 FFT.
 
 ### Dependencies
-* numpy
+* numpy (for FFT)
 
 #### Installing dependencies
 
