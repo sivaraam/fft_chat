@@ -11,10 +11,12 @@ https://medium.com/swlh/lets-write-a-chat-app-in-python-f6783a9ac170
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import process_fft as p_fft
+import os
 
 # An ID to identify that an image is being sent
 image_id = '{%IMG%}'
 image_id_bytes = p_fft.fft_send(image_id)
+image_size_bytes_limit = 6
 
 message_id = '{%MSG%}'
 message_id_bytes = p_fft.fft_send(message_id)
@@ -57,6 +59,49 @@ def handle_client(client):  # Takes client socket as argument.
     msg = "%s has joined the chat!" % name
     broadcast(msg)
     clients[client] = name
+
+    # Specially send the client an image at
+    # the beginning
+
+    # Path to the image
+    image_path = 'gravatar.png'
+
+    # Get the size of the image as we have to let the
+    # client know about the size of the image he has
+    # to receive
+    image_size = os.path.getsize(image_path)
+
+    # The size of the image as bytes to transmit it over
+    # the network
+    image_size_bytes=bytes(str(image_size), 'ascii')
+
+    # Currently the client can't handle images whose
+    # size in bytes dynamically. So, check if the
+    # client can handle it currently.
+    assert(len(image_size_bytes) == image_size_bytes_limit)
+
+    image = open(image_path, 'rb')
+
+    # Let the client know that an image is about
+    # to be transferred.
+    client.send(image_id_bytes)
+
+    # First, we send the size of the image
+    client.send(image_size_bytes)
+
+    print('Sending file...')
+
+    # Then we send the image as 1024 byte chunks until
+    # we're done completely.
+    while True:
+        image_bytes = image.read(1024)
+        if (image_bytes):
+            client.send(image_bytes)
+        else:
+            break
+
+    print('File sent')
+    image.close()
 
     while True:
         msg = recv(client)

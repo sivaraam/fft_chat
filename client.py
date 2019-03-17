@@ -15,6 +15,7 @@ import process_fft as p_fft
 
 image_id = '{%IMG%}'
 image_id_bytes = p_fft.fft_send(image_id)
+image_len_bytes_limit = 6
 
 message_id = '{%MSG%}'
 message_id_bytes = p_fft.fft_send(message_id)
@@ -31,6 +32,41 @@ def sock_recv(client):
     if msg_id == message_id_bytes:
         received_bytes = client.recv(BUFSIZ)
         msg = p_fft.fft_receive(received_bytes)
+    elif msg_id == image_id_bytes:
+        # For now, we save the image with a static name
+        img_file = 'received.png'
+
+        # Open the file to write the image
+        img = open(img_file, 'wb')
+
+        # Get the image size
+        #
+        # Currently, the implementation is limited by
+        # the fact it can't handle the image sizes
+        # dynamically. Yet to fix it. TODO.
+        img_len_bytes = client.recv(image_len_bytes_limit)
+        img_size = int(img_len_bytes.decode('utf-8'))
+        print('Size: ', img_size)
+
+        print('Receiving file')
+
+        # We receive the image as 1024 byte chunks
+        # until we receive it all
+        while (img_size > 0):
+            # The last chunk alone could be a little less
+            # than 1024, so we use the minimum of img_size
+            # and 1024 here.
+            img_bytes = client.recv(min(img_size, 1024))
+
+            # We write the image to the file as and when
+            # we receive it.
+            img.write(img_bytes)
+
+            img_size = img_size - 1024
+
+        img.close()
+        print('Received file.')
+        msg = "image"
     else:
         msg = 'Skipped message!'
         print('Skipping something that is not a message')
