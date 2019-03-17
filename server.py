@@ -12,14 +12,34 @@ from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import process_fft as p_fft
 
+# An ID to identify that an image is being sent
+image_id = bytes('{%IMG%}', 'utf-8')
+message_id = bytes('{%MSG%}', 'utf-8')
+id_len = max(len(image_id), len(message_id))
+
+def send(client, msg):
+     client.send(message_id)
+     msg_bytes = p_fft.fft_send(msg)
+     client.send(msg_bytes)
+
+def recv(client):
+    msg_id = client.recv(id_len)
+    if msg_id == message_id:
+        msg_bytes = client.recv(BUFSIZ)
+        msg = p_fft.fft_receive(msg_bytes)
+    else:
+        msg = 'Skipped message!'
+        print('Skipping something that is not a message')
+
+    return msg
+
 def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     greeting_msg = "Greetings from the cave! Now type your name and press enter!"
     while True:
         client, client_address = SERVER.accept()
         print("%s:%s has connected." % client_address)
-        greeting_bytes = p_fft.fft_send(greeting_msg)
-        client.send(greeting_bytes)
+        send(client, greeting_msg)
         addresses[client] = client_address
         Thread(target=handle_client, args=(client,)).start()
 
@@ -27,35 +47,29 @@ def accept_incoming_connections():
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
 
-    name_bytes = client.recv(BUFSIZ)
-    name = p_fft.fft_receive(name_bytes)
+    name = recv(client)
     welcome = 'Welcome %s! If you ever want to quit, type {quit} to exit.' % name
-    welcome_bytes = p_fft.fft_send(welcome)
-    client.send(welcome_bytes)
+    send(client, welcome)
     msg = "%s has joined the chat!" % name
     broadcast(msg)
     clients[client] = name
 
     while True:
-        msg_bytes = client.recv(BUFSIZ)
-        msg = p_fft.fft_receive(msg_bytes)
+        msg = recv(client)
         if msg != "{quit}":
             broadcast(msg, name+": ")
         else:
-            quit_bytes = p_fft.fft_send("{quit}")
-            client.send(bytes("{quit}", "utf8"))
+            send(client, "{quit}")
             client.close()
             del clients[client]
             broadcast("%s has left the chat." % name)
             break
 
-
 def broadcast(msg, prefix=""):  # prefix is for name identification.
     """Broadcasts a message to all the clients."""
 
     for sock in clients:
-        broadcast_bytes = p_fft.fft_send(prefix+msg)
-        sock.send(broadcast_bytes)
+        send(sock, prefix+msg)
 
 clients = {}
 addresses = {}

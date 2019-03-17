@@ -13,23 +13,40 @@ from threading import Thread
 import tkinter
 import process_fft as p_fft
 
+image_id = bytes('{%IMG%}', 'utf-8')
+message_id = bytes('{%MSG%}', 'utf-8')
+id_length = max(len(image_id), len(message_id))
+
+def sock_send(client, msg):
+    client.send(message_id)
+    send_bytes = p_fft.fft_send(msg)
+    client.send(send_bytes)
+
+def sock_recv(client):
+    msg_id = client.recv(id_length)
+    if msg_id == message_id:
+        received_bytes = client.recv(BUFSIZ)
+        msg = p_fft.fft_receive(received_bytes)
+    else:
+        msg = 'Skipped message!'
+        print('Skipping something that is not a message')
+
+    return msg
+
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
-            received_bytes = client_socket.recv(BUFSIZ)
-            msg = p_fft.fft_receive(received_bytes)
+            msg = sock_recv(client_socket)
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
             break
-
 
 def send(event=None):  # event is passed by binders.
     """Handles sending of messages."""
     msg = my_msg.get()
     my_msg.set("")  # Clears input field.
-    send_bytes = p_fft.fft_send(msg)
-    client_socket.send(send_bytes)
+    sock_send(client_socket, msg)
     if msg == "{quit}":
         client_socket.close()
         top.quit()
