@@ -13,18 +13,22 @@ from threading import Thread
 import tkinter
 import process_fft as p_fft
 
-image_id = bytes('{%IMG%}', 'utf-8')
-message_id = bytes('{%MSG%}', 'utf-8')
-id_length = max(len(image_id), len(message_id))
+image_id = '{%IMG%}'
+image_id_bytes = p_fft.fft_send(image_id)
+
+message_id = '{%MSG%}'
+message_id_bytes = p_fft.fft_send(message_id)
+
+id_length = max(len(image_id_bytes), len(message_id_bytes))
 
 def sock_send(client, msg):
-    client.send(message_id)
+    client.send(message_id_bytes)
     send_bytes = p_fft.fft_send(msg)
     client.send(send_bytes)
 
 def sock_recv(client):
     msg_id = client.recv(id_length)
-    if msg_id == message_id:
+    if msg_id == message_id_bytes:
         received_bytes = client.recv(BUFSIZ)
         msg = p_fft.fft_receive(received_bytes)
     else:

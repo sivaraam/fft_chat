@@ -13,18 +13,22 @@ from threading import Thread
 import process_fft as p_fft
 
 # An ID to identify that an image is being sent
-image_id = bytes('{%IMG%}', 'utf-8')
-message_id = bytes('{%MSG%}', 'utf-8')
-id_len = max(len(image_id), len(message_id))
+image_id = '{%IMG%}'
+image_id_bytes = p_fft.fft_send(image_id)
+
+message_id = '{%MSG%}'
+message_id_bytes = p_fft.fft_send(message_id)
+
+id_len = max(len(image_id_bytes), len(message_id_bytes))
 
 def send(client, msg):
-     client.send(message_id)
+     client.send(message_id_bytes)
      msg_bytes = p_fft.fft_send(msg)
      client.send(msg_bytes)
 
 def recv(client):
     msg_id = client.recv(id_len)
-    if msg_id == message_id:
+    if msg_id == message_id_bytes:
         msg_bytes = client.recv(BUFSIZ)
         msg = p_fft.fft_receive(msg_bytes)
     else:
