@@ -15,7 +15,7 @@ import process_fft as p_fft
 
 image_id = '{%IMG%}'
 image_id_bytes = p_fft.fft_send(image_id)
-image_len_bytes_limit = 6
+image_len_bytes_limit = 7
 
 message_id = '{%MSG%}'
 message_id_bytes = p_fft.fft_send(message_id)
@@ -39,6 +39,9 @@ def sock_recv(client):
         # Open the file to write the image
         img = open(img_file, 'wb')
 
+        # The container to get the FFT image bytes
+        img_fft_bytes_arr = bytearray()
+
         # Get the image size
         #
         # Currently, the implementation is limited by
@@ -56,14 +59,19 @@ def sock_recv(client):
             # The last chunk alone could be a little less
             # than 1024, so we use the minimum of img_size
             # and 1024 here.
-            img_bytes = client.recv(min(img_size, 1024))
-
-            # We write the image to the file as and when
-            # we receive it.
-            img.write(img_bytes)
+            img_fft_bytes_arr.extend(client.recv(min(img_size, 1024)))
 
             img_size = img_size - 1024
 
+        # Get the bytes from the container
+        img_fft_bytes = bytes(img_fft_bytes_arr)
+
+        # Get the image data from the FFT form of
+        # data
+        img_data = p_fft.fft_receive_bytes(img_fft_bytes)
+
+        # Write the image to the file
+        img.write(img_data)
         img.close()
 
         print('Received file.')

@@ -16,7 +16,7 @@ import os
 # An ID to identify that an image is being sent
 image_id = '{%IMG%}'
 image_id_bytes = p_fft.fft_send(image_id)
-image_size_bytes_limit = 6
+image_len_bytes_limit = 7
 
 message_id = '{%MSG%}'
 message_id_bytes = p_fft.fft_send(message_id)
@@ -66,39 +66,43 @@ def handle_client(client):  # Takes client socket as argument.
     # Path to the image
     image_path = 'gravatar.png'
 
+    image = open(image_path, 'rb')
+
+    # Get the image bytes
+    image_bytes = image.read()
+
+    # Get the FFT bytes from the image bytes
+    image_fft_bytes = p_fft.fft_send_bytes(image_bytes)
+
     # Get the size of the image as we have to let the
     # client know about the size of the image he has
     # to receive
-    image_size = os.path.getsize(image_path)
-
-    # The size of the image as bytes to transmit it over
-    # the network
-    image_size_bytes=bytes(str(image_size), 'ascii')
+    image_fft_len = len(image_fft_bytes)
+    image_fft_len_bytes = bytes(str(image_fft_len), 'ascii')
 
     # Currently the client can't handle images whose
     # size in bytes dynamically. So, check if the
     # client can handle it currently.
-    assert(len(image_size_bytes) == image_size_bytes_limit)
+    assert(len(image_fft_len_bytes) == image_len_bytes_limit)
 
-    image = open(image_path, 'rb')
+    print('Length: ', image_fft_len_bytes)
 
     # Let the client know that an image is about
     # to be transferred.
     client.send(image_id_bytes)
 
     # First, we send the size of the image
-    client.send(image_size_bytes)
+    client.send(image_fft_len_bytes)
 
     print('Sending file...')
 
     # Then we send the image as 1024 byte chunks until
     # we're done completely.
-    while True:
-        image_bytes = image.read(1024)
-        if (image_bytes):
-            client.send(image_bytes)
-        else:
-            break
+    chunk_size = 1024
+    for index in range(0, image_fft_len, chunk_size):
+        send_bytes = image_fft_bytes[index:index + chunk_size]
+
+        client.send(send_bytes)
 
     print('File sent')
     image.close()

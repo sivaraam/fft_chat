@@ -33,6 +33,13 @@ def fft_send(utf8_string_in):
 
     return pickle.dumps(fft_array_out)
 
+def fft_send_bytes(bytes_in):
+    fft_array_in = [elem for elem in bytes_in]
+
+    fft_array_out = np.fft.fft(fft_array_in)
+
+    return pickle.dumps(fft_array_out)
+
 """
 Function fft_receive:
 
@@ -80,3 +87,17 @@ def fft_receive(serialized_fft_bytes):
     utf8_string_out = "".join(utf8_chars_array_out)
 
     return utf8_string_out
+
+def fft_receive_bytes(serialized_fft_bytes):
+    deserialized_fft_array = pickle.loads(serialized_fft_bytes)
+
+    """
+    Apply inverse FFT to the array
+    """
+    ifft_array_out = np.fft.ifft(deserialized_fft_array)
+
+    bytes_array_out = [int(round(abs(ifft_char))) for ifft_char in ifft_array_out]
+
+    bytes_out = bytes(bytes_array_out)
+
+    return bytes_out
