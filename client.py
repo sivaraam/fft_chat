@@ -65,8 +65,9 @@ def sock_recv(client):
             img_size = img_size - 1024
 
         img.close()
+
         print('Received file.')
-        msg = "image"
+        msg = 'image'
     else:
         msg = 'Skipped message!'
         print('Skipping something that is not a message')
